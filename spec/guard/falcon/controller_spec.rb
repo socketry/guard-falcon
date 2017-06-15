@@ -19,10 +19,16 @@
 # THE SOFTWARE.
 
 require 'guard/compat/test/helper'
-require 'guard/myplugin'
+require 'guard/falcon/controller'
 
-RSpec.describe Guard::Falcon do
+RSpec.describe Guard::Falcon::Controller do
+	let(:config) {File.join(__dir__, 'config.ru')}
+	
+	subject {described_class.new(config: config)}
+	
 	it "should start server" do
-		# subject.start
+		subject.start
+		
+		expect(subject).to be_running
 	end
 end

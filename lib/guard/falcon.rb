@@ -18,68 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'guard/compat/plugin'
-
-require 'rack/builder'
-require 'rack/server'
-
-require 'async/container'
-require "falcon/server"
+require_relative 'falcon/controller'
 
 module Guard
-	class Falcon < Plugin
-		attr_reader :options, :runner
-
-		def self.default_env
-			ENV.fetch('RACK_ENV', 'development')
-		end
-
-		DEFAULT_OPTIONS = {
-			:bind => "tcp://localhost:9000",
-			:environment => default_env,
-			:config => 'config.ru',
-		}
-
-		def initialize(**options)
-			super
-			
-			@options = DEFAULT_OPTIONS.merge(options)
-			@container = nil
-		end
-
-		def run_server
-			app, options = Rack::Builder.parse_file(@options[:config])
-			
-			UI.info("Starting HTTP server on #{@options[:bind]}.")
-			
-			Async::Container::Threaded.new(concurrency: 2) do
-				server = ::Falcon::Server.new(app, [
-					Async::IO::Address.parse(@options[:bind], reuse_port: true)
-				])
-				
-				server.run
-			end
-		rescue
-			
-			return nil
-		end
-
-		def start
-			@container = run_server
-		end
-
-		def reload
-			stop
-			start
-		end
-
-		def stop
-			@container.stop
-			@container = nil
-		end
-
-		def run_on_change(paths)
-			reload
+	module Falcon
+		def self.new(*args)
+			Controller.new(*args)
 		end
 	end
 end
