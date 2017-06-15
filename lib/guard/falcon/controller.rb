@@ -46,20 +46,27 @@ module Guard
 				@container = nil
 			end
 
+			# As discussed in https://github.com/guard/guard/issues/713
+			def logger
+				Compat::UI
+			end
+
 			def run_server
 				begin
 					app, options = Rack::Builder.parse_file(@options[:config])
 				rescue
-					# Compat::UI.error "Failed to load #{@options[:config]}: #{$!}"
-					# Compat::UI.error $!.backtrace
+					logger.error "Failed to load #{@options[:config]}: #{$!}"
+					logger.error $!.backtrace
 				end
 				
-				# Compat::UI.info("Starting Falcon HTTP server on #{@options[:bind]}.")
+				logger.info("Starting Falcon HTTP server on #{@options[:bind]}.")
 				
 				Async::Container::Forked.new(concurrency: 2) do
 					server = ::Falcon::Server.new(app, [
 						Async::IO::Address.parse(@options[:bind], reuse_port: true)
 					])
+					
+					Process.setproctitle "Falcon HTTP #{@options[:bind]}"
 					
 					server.run
 				end
