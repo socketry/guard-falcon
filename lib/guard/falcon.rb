@@ -25,5 +25,10 @@ module Guard
 		def self.new(*args)
 			Controller.new(*args)
 		end
+		
+		# Workaround for https://github.com/guard/guard/pull/872
+		def self.superclass
+			nil
+		end
 	end
 end
