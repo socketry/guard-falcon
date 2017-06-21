@@ -17,7 +17,9 @@ if ENV['COVERAGE'] || ENV['TRAVIS']
 end
 
 require "bundler/setup"
-require "async/http"
+
+require 'guard/compat/test/helper'
+require 'guard/falcon'
 
 RSpec.configure do |config|
 	# Enable flags like --only-failures and --next-failure
