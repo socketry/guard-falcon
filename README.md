@@ -2,6 +2,10 @@
 
 Efficiently runs a asynchronous Falcon server, restarting it as required by guard.
 
+[![Build Status](https://secure.travis-ci.org/socketry/guard-falcon.svg)](http://travis-ci.org/socketry/guard-falcon)
+[![Code Climate](https://codeclimate.com/github/socketry/guard-falcon.svg)](https://codeclimate.com/github/socketry/guard-falcon)
+[![Coverage Status](https://coveralls.io/repos/socketry/guard-falcon/badge.svg)](https://coveralls.io/r/socketry/guard-falcon)
+
 ## Installation
 
 Add this line to your application's Gemfile:
