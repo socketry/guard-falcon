@@ -66,7 +66,7 @@ module Guard
 						Async::IO::Address.parse(@options[:bind], reuse_port: true)
 					])
 					
-					Process.setproctitle "Falcon HTTP #{@options[:bind]}"
+					Process.setproctitle "Guard::Falcon HTTP Server #{@options[:bind]}"
 					
 					server.run
 				end
