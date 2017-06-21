@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.authors       = ["Samuel Williams"]
 	spec.email         = ["samuel.williams@oriontransfer.co.nz"]
 
-	spec.summary       = ""
+	spec.summary       = "A guard plugin to run an instance of the falcon web server."
 	spec.homepage      = "https://github.com/socketry/guard-falcon"
 
 	spec.files         = `git ls-files -z`.split("\x0").reject do |f|
