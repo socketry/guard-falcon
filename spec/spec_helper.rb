@@ -18,6 +18,7 @@ end
 
 require "bundler/setup"
 
+require 'guard'
 require 'guard/compat/test/helper'
 require 'guard/falcon'
 
