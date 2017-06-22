@@ -29,14 +29,10 @@ require 'falcon/server'
 module Guard
 	module Falcon
 		class Controller < Plugin
-			def self.default_env
-				ENV.fetch('RACK_ENV', 'development')
-			end
-
 			DEFAULT_OPTIONS = {
-				:bind => "tcp://localhost:9000",
-				:environment => default_env,
-				:config => 'config.ru',
+				port: 9292,
+				host: 'localhost',
+				config: 'config.ru',
 			}
 
 			def initialize(**options)
@@ -63,7 +59,7 @@ module Guard
 				
 				Async::Container::Forked.new(concurrency: 2) do
 					server = ::Falcon::Server.new(app, [
-						Async::IO::Address.parse(@options[:bind], reuse_port: true)
+						Async::IO::Address.tcp(@options[:host], @options[:port], reuse_port: true)
 					])
 					
 					Process.setproctitle "Guard::Falcon HTTP Server #{@options[:bind]}"
