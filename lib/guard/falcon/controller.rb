@@ -55,12 +55,12 @@ module Guard
 					logger.error $!.backtrace
 				end
 				
-				logger.info("Starting Falcon HTTP server on #{@options[:bind]}.")
+				server_address = Async::IO::Address.tcp(@options[:host], @options[:port], reuse_port: true)
+				
+				logger.info("Starting Falcon HTTP server on #{server_address}.")
 				
 				Async::Container::Forked.new(concurrency: 2) do
-					server = ::Falcon::Server.new(app, [
-						Async::IO::Address.tcp(@options[:host], @options[:port], reuse_port: true)
-					])
+					server = ::Falcon::Server.new(app, [server_address])
 					
 					Process.setproctitle "Guard::Falcon HTTP Server #{@options[:bind]}"
 					
