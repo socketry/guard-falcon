@@ -55,7 +55,7 @@ module Guard
 					logger.error $!.backtrace
 				end
 				
-				server_address = Async::IO::Address.tcp(@options[:host], @options[:port], reuse_port: true)
+				server_address = Async::IO::Endpoint.tcp(@options[:host], @options[:port], reuse_port: true)
 				
 				logger.info("Starting Falcon HTTP server on #{server_address}.")
 				
