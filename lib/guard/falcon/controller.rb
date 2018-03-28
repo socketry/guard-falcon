@@ -60,7 +60,7 @@ module Guard
 				logger.info("Starting Falcon HTTP server on #{server_address}.")
 				
 				Async::Container::Forked.new(concurrency: 2) do
-					server = ::Falcon::Server.new(app, [server_address])
+					server = ::Falcon::Server.new(app, server_address)
 					
 					Process.setproctitle "Guard::Falcon HTTP Server #{@options[:bind]}"
 					
