@@ -26,6 +26,7 @@ require 'rack/server'
 require 'async/container/forked'
 
 require 'async/io/host_endpoint'
+require 'async/http/url_endpoint'
 
 require 'falcon/server'
 require 'falcon/adapters/rack'
@@ -34,8 +35,6 @@ module Guard
 	module Falcon
 		class Controller < Plugin
 			DEFAULT_OPTIONS = {
-				port: 9292,
-				host: 'localhost',
 				config: 'config.ru',
 				concurrency: 2,
 			}
@@ -60,14 +59,22 @@ module Guard
 					logger.error $!.backtrace
 				end
 				
-				server_address = Async::IO::Endpoint.tcp(@options[:host], @options[:port], reuse_port: true)
+				# Support existing use cases where only port: is specified.
+				if @options[:endpoint]
+					endpoint = @options[:endpoint]
+				elsif port = @options[:port]
+					host = @options[:host] || 'localhost'
+					endpoint = Async::IO::Endpoint.tcp(host, port, reuse_port: true)
+				else
+					endpoint = Async::HTTP::URLEndpoint.parse("http://localhost:9292", reuse_port: true)
+				end
 				
-				logger.info("Starting Falcon HTTP server on #{server_address}.")
+				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
 				Async::Container::Forked.new(concurrency: @options[:concurrency]) do
-					server = ::Falcon::Server.new(::Falcon::Adapters::Rack.new(app), server_address)
+					server = ::Falcon::Server.new(::Falcon::Adapters::Rack.new(app), endpoint)
 					
-					Process.setproctitle "Guard::Falcon HTTP Server #{@options[:bind]}"
+					Process.setproctitle "Guard::Falcon HTTP Server: #{endpoint}"
 					
 					server.run
 				end
