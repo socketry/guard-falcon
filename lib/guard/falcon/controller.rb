@@ -27,9 +27,9 @@ require 'async/container/forked'
 
 require 'async/io/host_endpoint'
 require 'async/http/url_endpoint'
+require 'async/io/shared_endpoint'
 
 require 'falcon/server'
-require 'falcon/adapters/rack'
 
 module Guard
 	module Falcon
@@ -37,12 +37,14 @@ module Guard
 			DEFAULT_OPTIONS = {
 				config: 'config.ru',
 				concurrency: 2,
+				verbose: false,
 			}
 
 			def initialize(**options)
 				super
 				
 				@options = DEFAULT_OPTIONS.merge(options)
+				@endpoint = nil
 				@container = nil
 			end
 
@@ -50,15 +52,8 @@ module Guard
 			def logger
 				Compat::UI
 			end
-
-			def run_server
-				begin
-					app, options = Rack::Builder.parse_file(@options[:config])
-				rescue
-					logger.error "Failed to load #{@options[:config]}: #{$!}"
-					logger.error $!.backtrace
-				end
-				
+			
+			private def bind_endpoint
 				# Support existing use cases where only port: is specified.
 				if @options[:endpoint]
 					endpoint = @options[:endpoint]
@@ -69,10 +64,28 @@ module Guard
 					endpoint = Async::HTTP::URLEndpoint.parse("http://localhost:9292", reuse_port: true)
 				end
 				
+				Async::Reactor.run do
+					Async::IO::SharedEndpoint.bound(endpoint)
+				end.result
+			end
+			
+			def endpoint
+				@endpoint ||= bind_endpoint
+			end
+			
+			def run_server
 				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
 				Async::Container::Forked.new(concurrency: @options[:concurrency]) do
-					server = ::Falcon::Server.new(::Falcon::Adapters::Rack.new(app), endpoint)
+					begin
+						rack_app, options = Rack::Builder.parse_file(@options[:config])
+					rescue
+						logger.error "Failed to load #{@options[:config]}: #{$!}"
+						logger.error $!.backtrace
+					end
+					
+					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
+					server = ::Falcon::Server.new(app, @endpoint)
 					
 					Process.setproctitle "Guard::Falcon HTTP Server: #{endpoint}"
 					
