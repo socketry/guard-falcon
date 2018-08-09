@@ -30,6 +30,7 @@ require 'async/http/url_endpoint'
 require 'async/io/shared_endpoint'
 
 require 'falcon/server'
+require 'falcon/endpoint'
 
 module Guard
 	module Falcon
@@ -53,27 +54,27 @@ module Guard
 				Compat::UI
 			end
 			
-			private def bind_endpoint
+			private def build_endpoint
 				# Support existing use cases where only port: is specified.
 				if @options[:endpoint]
-					endpoint = @options[:endpoint]
-				elsif port = @options[:port]
-					host = @options[:host] || 'localhost'
-					endpoint = Async::IO::Endpoint.tcp(host, port, reuse_port: true)
+					return @options[:endpoint]
 				else
-					endpoint = Async::HTTP::URLEndpoint.parse("http://localhost:9292", reuse_port: true)
+					url = @options.fetch(:url, "http://localhost")
+					port = @options.fetch(:port, 9292)
+					
+					return ::Falcon::Endpoint.parse(url, port: port)
 				end
-				
-				Async::Reactor.run do
-					Async::IO::SharedEndpoint.bound(endpoint)
-				end.result
 			end
 			
 			def endpoint
-				@endpoint ||= bind_endpoint
+				@endpoint ||= build_endpoint
 			end
 			
 			def run_server
+				shared_endpoint = Async::Reactor.run do
+					Async::IO::SharedEndpoint.bound(endpoint)
+				end.result
+				
 				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
 				Async::Container::Forked.new(concurrency: @options[:concurrency]) do
@@ -85,7 +86,7 @@ module Guard
 					end
 					
 					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
-					server = ::Falcon::Server.new(app, @endpoint)
+					server = ::Falcon::Server.new(app, shared_endpoint, endpoint.protocol)
 					
 					Process.setproctitle "Guard::Falcon HTTP Server: #{endpoint}"
 					
