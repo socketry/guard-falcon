@@ -30,5 +30,9 @@ RSpec.describe Guard::Falcon::Controller do
 		subject.start
 		
 		expect(subject).to be_running
+		
+		subject.stop
+		
+		expect(subject).to_not be_running
 	end
 end
