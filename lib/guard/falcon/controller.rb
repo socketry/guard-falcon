@@ -86,7 +86,7 @@ module Guard
 					end
 					
 					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
-					server = ::Falcon::Server.new(app, shared_endpoint, endpoint.protocol)
+					server = ::Falcon::Server.new(app, shared_endpoint, endpoint.protocol, endpoint.scheme)
 					
 					Process.setproctitle "Guard::Falcon HTTP Server: #{endpoint}"
 					
