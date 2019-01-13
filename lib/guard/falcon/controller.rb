@@ -73,7 +73,7 @@ module Guard
 			def run_server
 				shared_endpoint = Async::Reactor.run do
 					Async::IO::SharedEndpoint.bound(endpoint)
-				end.result
+				end.wait
 				
 				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
