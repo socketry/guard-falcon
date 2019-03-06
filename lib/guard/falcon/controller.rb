@@ -77,7 +77,7 @@ module Guard
 				
 				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
-				container = Async::Container::Forked.new(concurrency: @options[:concurrency]) do
+				container = Async::Container::Forked.new do
 					begin
 						rack_app, options = Rack::Builder.parse_file(@options[:config])
 					rescue
