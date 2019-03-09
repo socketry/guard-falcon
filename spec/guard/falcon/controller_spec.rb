@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'guard/falcon'
 require 'guard/compat/test/helper'
 require 'guard/falcon/controller'
 

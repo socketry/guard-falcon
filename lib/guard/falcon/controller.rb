@@ -37,7 +37,7 @@ module Guard
 		class Controller < Plugin
 			DEFAULT_OPTIONS = {
 				config: 'config.ru',
-				concurrency: 2,
+				count: 1,
 				verbose: false,
 			}
 
@@ -46,12 +46,12 @@ module Guard
 				
 				@options = DEFAULT_OPTIONS.merge(options)
 				@endpoint = nil
-				@container = nil
+				@thread = nil
 			end
 
 			# As discussed in https://github.com/guard/guard/issues/713
 			def logger
-				Compat::UI
+				Async.logger
 			end
 			
 			private def build_endpoint
@@ -71,39 +71,38 @@ module Guard
 			end
 			
 			def run_server
-				shared_endpoint = Async::Reactor.run do
+				@shared_endpoint ||= Async::Reactor.run do
 					Async::IO::SharedEndpoint.bound(endpoint)
 				end.wait
 				
 				logger.info("Starting Falcon HTTP server on #{endpoint}.")
 				
-				container = Async::Container::Forked.new(concurrency: @options[:concurrency]) do
-					begin
-						rack_app, options = Rack::Builder.parse_file(@options[:config])
-					rescue
-						logger.error "Failed to load #{@options[:config]}: #{$!}"
-						logger.error $!.backtrace
+				return Thread.new do
+					container = Async::Container::Forked.new
+					
+					container.run(count: @options[:count], restart: true, name: "Guard::Falcon: #{endpoint}") do
+						begin
+							rack_app, options = Rack::Builder.parse_file(@options[:config])
+						rescue => error
+							logger.error(error) {"Failed to load #{@options[:config]}"}
+						end
+						
+						app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
+						server = ::Falcon::Server.new(app, @shared_endpoint, endpoint.protocol, endpoint.scheme)
+						
+						server.run
 					end
 					
-					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
-					server = ::Falcon::Server.new(app, shared_endpoint, endpoint.protocol, endpoint.scheme)
-					
-					Process.setproctitle "Guard::Falcon HTTP Server: #{endpoint}"
-					
-					server.run
+					container.wait
 				end
-				
-				shared_endpoint.close
-				
-				return container
 			end
 
 			def start
-				@container = run_server
+				@thread = run_server
 			end
 
 			def running?
-				!@container.nil?
+				!@thread.nil?
 			end
 
 			def reload
@@ -112,9 +111,10 @@ module Guard
 			end
 
 			def stop
-				if @container
-					@container.stop
-					@container = nil
+				if @thread
+					@thread.kill
+					@thread.join
+					@thread = nil
 				end
 			end
 
