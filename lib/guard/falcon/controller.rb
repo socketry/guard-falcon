@@ -26,7 +26,6 @@ require 'rack/server'
 require 'async/container/forked'
 
 require 'async/io/host_endpoint'
-require 'async/http/url_endpoint'
 require 'async/io/shared_endpoint'
 
 require 'falcon/server'
