@@ -59,7 +59,7 @@ module Guard
 				if @options[:endpoint]
 					return @options[:endpoint]
 				else
-					url = @options.fetch(:url, "http://localhost")
+					url = @options.fetch(:url, "https://localhost")
 					port = @options.fetch(:port, 9292)
 					
 					return ::Falcon::Endpoint.parse(url, port: port)
