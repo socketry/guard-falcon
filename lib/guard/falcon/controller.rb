@@ -70,8 +70,8 @@ module Guard
 				@endpoint ||= build_endpoint
 			end
 			
-			def run_server(container = Async::Container.new)
-				bound_endpoint ||= Async::Reactor.run do
+			def run_server(container = Async::Container::Threaded.new)
+				@bound_endpoint ||= Async::Reactor.run do
 					Async::IO::SharedEndpoint.bound(endpoint)
 				end.wait
 				
@@ -85,13 +85,9 @@ module Guard
 					end
 					
 					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
-					server = ::Falcon::Server.new(app, bound_endpoint, endpoint.protocol, endpoint.scheme)
+					server = ::Falcon::Server.new(app, @bound_endpoint, endpoint.protocol, endpoint.scheme)
 					
 					server.run
-				end
-				
-				container.attach do
-					bound_endpoint.close
 				end
 				
 				return container
