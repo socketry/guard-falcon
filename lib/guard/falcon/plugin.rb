@@ -29,29 +29,34 @@ require 'async/container'
 require 'async/io/host_endpoint'
 require 'async/io/shared_endpoint'
 
-require 'falcon/server'
 require 'falcon/endpoint'
+require 'falcon/controller/serve'
 
 module Guard
 	module Falcon
-		class Controller < Plugin
+		class Plugin < Guard::Plugin
 			DEFAULT_OPTIONS = {
 				config: 'config.ru',
 				count: 1,
 				verbose: false,
 			}
-
+			
 			def initialize(**options)
 				super
 				
 				@options = DEFAULT_OPTIONS.merge(options)
+				
 				@endpoint = nil
-				@container = nil
+				
+				@controller = ::Falcon::Controller::Serve.new(self)
 			end
-
-			# As discussed in https://github.com/guard/guard/issues/713
-			def logger
-				Async.logger
+			
+			def container_class
+				Async::Container::Threaded
+			end
+			
+			def container_options
+				{}
 			end
 			
 			private def build_endpoint
@@ -70,49 +75,31 @@ module Guard
 				@endpoint ||= build_endpoint
 			end
 			
-			def run_server(container = Async::Container::Threaded.new)
-				@bound_endpoint ||= Async::Reactor.run do
-					Async::IO::SharedEndpoint.bound(endpoint)
-				end.wait
-				
-				logger.info("Starting Falcon HTTP server on #{endpoint}.")
-				
-				container.run(count: @options[:count], restart: true, name: "Guard::Falcon: #{endpoint}") do
-					begin
-						rack_app, options = Rack::Builder.parse_file(@options[:config])
-					rescue => error
-						logger.error(error) {"Failed to load #{@options[:config]}"}
-					end
-					
-					app = ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
-					server = ::Falcon::Server.new(app, @bound_endpoint, endpoint.protocol, endpoint.scheme)
-					
-					server.run
-				end
-				
-				return container
+			def load_app
+				Rack::Builder.parse_file(@options[:config])
 			end
-
+			
+			# As discussed in https://github.com/guard/guard/issues/713
+			def logger
+				Async.logger
+			end
+			
 			def start
-				@container = run_server
+				@controller.start
 			end
-
+			
 			def running?
-				!@container.nil?
+				@controller.running?
 			end
-
+			
 			def reload
-				stop
-				start
+				@controller.reload
 			end
-
+			
 			def stop
-				if @container
-					@container.stop(false)
-					@container = nil
-				end
+				@controller.stop
 			end
-
+			
 			def run_on_change(paths)
 				reload
 			end

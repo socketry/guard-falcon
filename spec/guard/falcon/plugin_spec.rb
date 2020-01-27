@@ -20,9 +20,9 @@
 
 require 'guard/falcon'
 require 'guard/compat/test/helper'
-require 'guard/falcon/controller'
+require 'guard/falcon/plugin'
 
-RSpec.describe Guard::Falcon::Controller do
+RSpec.describe Guard::Falcon::Plugin do
 	let(:config) {File.join(__dir__, 'config.ru')}
 	
 	subject {described_class.new(config: config)}

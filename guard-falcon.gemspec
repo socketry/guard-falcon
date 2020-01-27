@@ -16,7 +16,9 @@ Gem::Specification.new do |spec|
 	spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
 	spec.require_paths = ["lib"]
 
-	spec.add_dependency("falcon", "~> 0.31")
+	spec.add_dependency("falcon", "~> 0.35")
+	
+	spec.add_dependency("async-container", "~> 0.16.0")
 	
 	spec.add_dependency("guard")
 	spec.add_dependency("guard-compat", "~> 1.2")

@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'falcon/controller'
+require_relative 'falcon/plugin'
 
 module Guard
 	module Falcon
 		def self.new(*args)
-			Controller.new(*args)
+			Plugin.new(*args)
 		end
 		
 		# Workaround for https://github.com/guard/guard/pull/872
