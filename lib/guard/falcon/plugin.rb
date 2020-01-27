@@ -21,14 +21,11 @@
 require 'guard/compat/plugin'
 
 require 'rack/builder'
-require 'rack/server'
 
 require 'async/logger'
 require 'async/container'
 
-require 'async/io/host_endpoint'
-require 'async/io/shared_endpoint'
-
+require 'falcon/server'
 require 'falcon/endpoint'
 require 'falcon/controller/serve'
 
@@ -76,7 +73,9 @@ module Guard
 			end
 			
 			def load_app
-				Rack::Builder.parse_file(@options[:config])
+				rack_app, options = Rack::Builder.parse_file(@options[:config])
+				
+				return ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose]), options
 			end
 			
 			# As discussed in https://github.com/guard/guard/issues/713
