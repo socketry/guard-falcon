@@ -92,7 +92,7 @@ module Guard
 			end
 			
 			def reload
-				@controller.reload
+				@controller.restart
 			end
 			
 			def stop
