@@ -75,7 +75,7 @@ module Guard
 			def load_app
 				rack_app, options = Rack::Builder.parse_file(@options[:config])
 				
-				return ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose]), options
+				return ::Falcon::Server.middleware(rack_app, verbose: @options[:verbose])
 			end
 			
 			# As discussed in https://github.com/guard/guard/issues/713
