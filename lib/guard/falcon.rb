@@ -22,8 +22,8 @@ require_relative 'falcon/plugin'
 
 module Guard
 	module Falcon
-		def self.new(*args)
-			Plugin.new(*args)
+		def self.new(*arguments, **options)
+			Plugin.new(*arguments, **options)
 		end
 		
 		# Workaround for https://github.com/guard/guard/pull/872
