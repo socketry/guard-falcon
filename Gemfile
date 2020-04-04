@@ -1,8 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in async-io.gemspec
+# Specify your gem's dependencies in guard-falcon.gemspec
 gemspec
-
-group :test do
-	gem 'covered'
-end

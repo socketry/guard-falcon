@@ -23,7 +23,8 @@ Gem::Specification.new do |spec|
 	spec.add_dependency("guard")
 	spec.add_dependency("guard-compat", "~> 1.2")
 	
+	spec.add_development_dependency "covered"
 	spec.add_development_dependency "bundler"
 	spec.add_development_dependency "rspec", "~> 3.6"
-	spec.add_development_dependency "rake"
+	spec.add_development_dependency "bake-bundler"
 end
