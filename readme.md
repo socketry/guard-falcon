@@ -2,40 +2,36 @@
 
 Efficiently runs a asynchronous Falcon server, restarting it as required by guard.
 
-[![Build Status](https://secure.travis-ci.org/socketry/guard-falcon.svg)](http://travis-ci.org/socketry/guard-falcon)
-[![Code Climate](https://codeclimate.com/github/socketry/guard-falcon.svg)](https://codeclimate.com/github/socketry/guard-falcon)
-[![Coverage Status](https://coveralls.io/repos/socketry/guard-falcon/badge.svg)](https://coveralls.io/r/socketry/guard-falcon)
+[![Development Status](https://github.com/socketry/guard-falcon/workflows/Test/badge.svg)](https://github.com/socketry/guard-falcon/actions?workflow=Test)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-```ruby
+``` ruby
 gem 'guard-falcon'
 ```
 
 And then execute:
 
-	$ bundle
+    $ bundle
 
 ## Usage
 
 Falcon can restart very quickly and is ideal for use with guard. In your `Guardfile`:
 
-```ruby
-
+``` ruby
 guard :falcon do
 end
-
 ```
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+1.  Fork it
+2.  Create your feature branch (`git checkout -b my-new-feature`)
+3.  Commit your changes (`git commit -am 'Add some feature'`)
+4.  Push to the branch (`git push origin my-new-feature`)
+5.  Create new Pull Request
 
 ## License
 

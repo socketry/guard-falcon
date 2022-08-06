@@ -22,7 +22,7 @@ require 'guard/compat/plugin'
 
 require 'rack/builder'
 
-require 'async/logger'
+require 'console/logger'
 require 'async/container'
 
 require 'falcon/server'
