@@ -10,6 +10,9 @@ Gem::Specification.new do |spec|
 	spec.authors = ["Samuel Williams", "Huba Nagy", "Olle Jonsson"]
 	spec.license = "MIT"
 	
+	spec.cert_chain  = ['release.cert']
+	spec.signing_key = File.expand_path('~/.gem/release.pem')
+	
 	spec.homepage = "https://github.com/socketry/guard-falcon"
 	
 	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
