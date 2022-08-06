@@ -80,7 +80,7 @@ module Guard
 			
 			# As discussed in https://github.com/guard/guard/issues/713
 			def logger
-				Async.logger
+				Console.logger
 			end
 			
 			def start
