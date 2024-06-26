@@ -7,6 +7,7 @@
 require 'guard/compat/plugin'
 
 require 'falcon'
+require 'falcon/endpoint'
 require 'falcon/environment/rackup'
 require 'falcon/environment/server'
 require 'async/service'
@@ -15,11 +16,23 @@ require 'console'
 module Guard
 	module Falcon
 		class Plugin < Guard::Plugin
+			module Environment
+				include ::Falcon::Environment::Server
+				include ::Falcon::Environment::Rackup
+				
+				# The upstream endpoint that will handle incoming requests.
+				# @returns [Async::HTTP::Endpoint]
+				def endpoint
+					::Falcon::Endpoint.parse(url).with(
+						reuse_address: true,
+						# reuse_port: true,
+						timeout: timeout,
+					)
+				end
+			end
+			
 			def self.default_environment(**options)
-				Async::Service::Environment.new(::Falcon::Environment::Server).with(
-					::Falcon::Environment::Rackup,
-					**options
-				)
+				Async::Service::Environment.new(Environment).with(**options)
 			end
 			
 			def initialize(**options)
@@ -46,6 +59,7 @@ module Guard
 			end
 			
 			def start
+				Console.info(self, "Starting...")
 				@controller.start
 			end
 			
@@ -54,10 +68,12 @@ module Guard
 			end
 			
 			def reload
+				Console.info(self, "Reloading...")
 				@controller.restart
 			end
 			
 			def stop
+				Console.info(self, "Stopping...")
 				@controller.stop
 			end
 			

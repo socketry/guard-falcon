@@ -1,2 +1,3 @@
-
-run lambda {|env| [200, {}, []]}
+run do |env|
+	[200, {}, []]
+end

@@ -1,0 +1,5 @@
+require 'guard/falcon'
+
+guard "falcon", count: 1, url: "http://0.0.0.0:2300" do
+	watch('config.ru')
+end

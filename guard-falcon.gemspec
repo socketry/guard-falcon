@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
 	
 	spec.required_ruby_version = ">= 3.1"
 	
-	spec.add_dependency "async-container", "~> 0.16"
 	spec.add_dependency "console", "~> 1.0"
 	spec.add_dependency "falcon", "~> 0.35"
 	spec.add_dependency "guard"
