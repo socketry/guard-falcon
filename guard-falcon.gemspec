@@ -15,16 +15,17 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/guard-falcon"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.metadata = {
+		"source_code_uri" => "https://github.com/socketry/guard-falcon.git",
+	}
+	
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
+	
+	spec.required_ruby_version = ">= 3.1"
 	
 	spec.add_dependency "async-container", "~> 0.16"
 	spec.add_dependency "console", "~> 1.0"
 	spec.add_dependency "falcon", "~> 0.35"
 	spec.add_dependency "guard"
 	spec.add_dependency "guard-compat", "~> 1.2"
-	
-	spec.add_development_dependency "bake-bundler"
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "rspec", "~> 3.6"
 end
